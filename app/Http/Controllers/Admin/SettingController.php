@@ -21,6 +21,11 @@ class SettingController extends Controller
         return view('admin.setting.index', compact('setting'));
     }
 
+    public function show()
+    {
+
+    }
+
     /**
      * Update the specified resource in storage.
      *
@@ -31,8 +36,8 @@ class SettingController extends Controller
     public function update(Request $request, Setting $setting)
     {
         $validated = $request->validate([
-            'about_title' => 'required','min:3',
-            'about_description' => 'required','min:10',
+            'about_title' => 'required', 'min:3',
+            'about_description' => 'required', 'min:10',
             'fb_url' => 'required|url',
             'github_url' => 'required|url',
             'linkedin_url' => 'required|url',
@@ -43,17 +48,14 @@ class SettingController extends Controller
             'about_photo' => 'image|mimes:jpeg,png,jpg|max:2048'
         ]);
 
-        // $setting = Setting::first();
-        if($request->hasfile('image')){
-            if($setting->about_photo != null){
-                Storage::delete($setting->about_photo);
-            }
-            $get_new_file = $request->file('image')->store('public/images');
-            $newFilePath = str_replace('public/', '', $get_new_file);
+        $setting = Setting::first();
+        if ($request->hasfile('image')) {
+
+            $newFilePath =  $this->updateImage($request, 'image','settings' ,$setting->about_photo);
+
             $setting->about_photo = $newFilePath;
         }
         $setting->update($validated);
-        return to_route('admin.setting.index')->with('message','Data Updated');
+        return to_route('admin.setting.index')->with('message', 'Données mises à jour');
     }
-
 }

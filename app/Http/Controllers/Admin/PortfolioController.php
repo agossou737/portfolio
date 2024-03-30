@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Portfolio;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use PhpParser\Node\Expr\Cast\String_;
 
 class PortfolioController extends Controller
 {
@@ -17,8 +18,8 @@ class PortfolioController extends Controller
      */
     public function index()
     {
-        $portfolios= Portfolio::with('category')->get();
-        return view('admin.portfolio.index',compact('portfolios'));
+        $portfolios = Portfolio::with('category')->get();
+        return view('admin.portfolio.index', compact('portfolios'));
     }
 
     /**
@@ -29,7 +30,7 @@ class PortfolioController extends Controller
     public function create()
     {
         $categories = Category::all();
-        return view('admin.portfolio.create',compact('categories'));
+        return view('admin.portfolio.create', compact('categories'));
     }
 
     /**
@@ -38,7 +39,7 @@ class PortfolioController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request): String
     {
         $validated = $request->validate([
             'title' => 'required|min:4',
@@ -50,15 +51,19 @@ class PortfolioController extends Controller
         $portfolio = new Portfolio();
         $portfolio->title = $validated['title'];
         $portfolio->project_url = $validated['project_url'];
-        $portfolio->cat_id = $request->cat_id;
+        $portfolio->category_id = $request->cat_id;
 
-        if($request->hasfile('image')){
-            $get_file = $request->file('image')->store('images/portfolios');
+        if ($request->hasfile('image')) {
+
+            $get_file =  $this->uploadImage($request, 'image', 'portfolios');
             $portfolio->image = $get_file;
         }
 
-        $portfolio->save();
-        return to_route('admin.portfolio.index')->with('message','Portfolio Added');
+        if ($portfolio->save()) {
+            return 'success';
+        } else {
+            return 'fail';
+        }
     }
 
 
@@ -71,7 +76,7 @@ class PortfolioController extends Controller
     public function edit(Portfolio $portfolio)
     {
         $categories = Category::all();
-        return view('admin.portfolio.edit', compact('portfolio','categories'));
+        return view('admin.portfolio.edit', compact('portfolio', 'categories'));
     }
 
     /**
@@ -81,7 +86,7 @@ class PortfolioController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Portfolio $portfolio)
+    public function update(Request $request, Portfolio $portfolio): String
     {
         $validated = $request->validate([
             'title' => 'required|min:4',
@@ -91,16 +96,21 @@ class PortfolioController extends Controller
 
         $portfolio->title = $validated['title'];
         $portfolio->project_url = $validated['project_url'];
-        $portfolio->cat_id = $request->cat_id;
+        $portfolio->category_id = $request->cat_id;
 
-        if($request->hasfile('image')){
-            Storage::delete($portfolio->image);
-            $get_file = $request->file('image')->store('images/portfolios');
+        if ($request->hasfile('image')) {
+            $get_file = $this->updateImage($request, 'image', 'portfolios', $portfolio->image);
             $portfolio->image = $get_file;
         }
 
-        $portfolio->update();
-        return to_route('admin.portfolio.index')->with('message','Portfolio Updated');
+        if($portfolio->update())
+        {
+            return 'success';
+        }
+        else {
+            return 'fail';
+        }
+
     }
 
     /**
@@ -111,10 +121,10 @@ class PortfolioController extends Controller
      */
     public function destroy(Portfolio $portfolio)
     {
-        if($portfolio->image != null){
+        if ($portfolio->image != null) {
             Storage::delete($portfolio->image);
         }
-        $portfolio -> delete();
+        $portfolio->delete();
         return back()->with('message', 'Portfolio Deleted');
     }
 
@@ -123,13 +133,12 @@ class PortfolioController extends Controller
         $searchedItem = $request->input('search');
 
         $portfolios = Portfolio::query()
-        ->where('title', 'LIKE', "%{$searchedItem}%")
-        ->orWhere('project_url', 'LIKE', "%{$searchedItem}%")
-        ->get();
+            ->where('title', 'LIKE', "%{$searchedItem}%")
+            ->orWhere('project_url', 'LIKE', "%{$searchedItem}%")
+            ->get();
 
 
-    // Return the search view with the resluts compacted
-    return view('admin.portfolio.search', compact('portfolios'));
-
+        // Return the search view with the resluts compacted
+        return view('admin.portfolio.search', compact('portfolios'));
     }
 }

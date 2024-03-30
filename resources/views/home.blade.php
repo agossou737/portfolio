@@ -27,7 +27,7 @@
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-lg-5 px-5 pl-lg-0 pb-5 pb-lg-0">
-                    <img class="img-fluid w-100 rounded-circle shadow-sm" src="{{ asset("storage/$user?->profile_pic") }}"
+                    <img class="img-fluid w-100 rounded shadow-sm" src="{{ asset("$user->profile_pic") }}"
                         alt="">
                 </div>
                 <div class="col-lg-7 text-center text-lg-left">
@@ -60,7 +60,7 @@
             </div>
             <div class="row align-items-center">
                 <div class="col-lg-5 pb-4 pb-lg-0">
-                    <img class="img-fluid rounded w-100" src="{{ asset("storage/$setting->about_photo") }}" alt="">
+                    <img class="img-fluid rounded w-100" src="{{ asset("$setting->about_photo") }}" alt="">
                 </div>
                 <div class="col-lg-7">
                     <h3 class="mb-4">{{ $setting->about_title }}</h3>

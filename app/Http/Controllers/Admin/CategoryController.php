@@ -35,12 +35,16 @@ class CategoryController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request): String
     {
-        $validated = $request->validate(['name'=> ['required','min:3']]);
-        Category::create($validated);
+        $validated = $request->validate(['name' => ['required', 'min:3']]);
+        $cat = Category::create($validated);
 
-        return to_route('admin.category.index')->with('message','New Category Added');
+        if ($cat) {
+            return 'success';
+        } else {
+            return 'fail';
+        }
     }
 
     /**
@@ -61,11 +65,14 @@ class CategoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Category $category){
-        $validated = $request->validate(['name'=> ['required','min:3']]);
-        $category->update($validated);
-
-        return to_route('admin.category.index')->with('message','Category Updated');
+    public function update(Request $request, Category $category): String
+    {
+        $validated = $request->validate(['name' => ['required', 'min:3']]);
+        if ($category->update($validated)) {
+            return 'success';
+        } else {
+            return 'fail';
+        }
     }
 
     /**
@@ -74,9 +81,12 @@ class CategoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Category $category)
+    public function destroy(Category $category): String
     {
-        $category->delete();
-        return to_route('admin.category.index')->with('message', 'Category Deleted');
+        if ($category->delete()) {
+            return 'success';
+        } else {
+            return 'fail';
+        }
     }
 }

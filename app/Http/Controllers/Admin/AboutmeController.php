@@ -44,18 +44,22 @@ class AboutmeController extends Controller
     ]);
 
     if($request->hasfile('image')){
-        if($user->profile_pic != null){
-            Storage::delete($user->profile_pic);
-        }
-        $get_new_file = $request->file('image')->store('public/images');
 
-        $newFilePath = str_replace('public/', '', $get_new_file);
+        $newFilePath = $this->updateImage($request, 'image', 'users', $user->profile_pic);
+
         $user->profile_pic = $newFilePath;
     }
 
-    $user->update($validated);
+    if($user->update($validated))
+    {
+        return 'success';
+    }
 
-    return to_route('admin.aboutme.index')->with('message','Data Updated');
+    else {
+        return 'fail';
+    }
+
+
     }
 }
 

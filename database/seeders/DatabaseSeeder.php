@@ -2,7 +2,14 @@
 
 namespace Database\Seeders;
 
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Category;
+use App\Models\Portfolio;
+use App\Models\Qualification;
+use App\Models\Review;
+use App\Models\Service;
+use App\Models\Setting;
+use App\Models\Skill;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -14,21 +21,29 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        \App\Models\Setting::create([
-            'about_title' => 'Software Engineer',
-            'about_description' => 'Lorem ipsum dolor sit, amet consectetur adipisicing elit.',
-            'fb_url' => 'https://www.facebook.com/yasser.elgammal/',
-            'github_url' => 'https://github.com/YasserElgammal',
-            'linkedin_url' => 'https://www.linkedin.com/in/elgammal/',
-            'freelance_url' => '#li',
-            'cv_url' => '#cv',
-            'video_url' => '#video'
-        ]);
-        // \App\Models\User::factory(1)->create();
+        // Créer les catégories
+        $categories = Category::factory()->count(10)->create();
 
-        \App\Models\User::factory()->create([ 
-            'name' => 'Profile User',
-            'email' => 'test@example.com',
-        ]);
+        // Créer les qualifications
+        Qualification::factory()->count(50)->create();
+
+        // Créer les portfolios liés aux catégories
+        $categories->each(function ($category) {
+            $category->portfolios()->saveMany(Portfolio::factory()->count(3)->make());
+        });
+
+        // Créer les avis
+        Review::factory()->count(20)->create();
+
+        // Créer les services
+        Service::factory()->count(15)->create();
+
+        // Créer les paramètres
+        Setting::factory()->count(5)->create();
+
+        // Créer les compétences
+        Skill::factory()->count(10)->create();
+
+        User::factory()->count(1)->create();
     }
 }

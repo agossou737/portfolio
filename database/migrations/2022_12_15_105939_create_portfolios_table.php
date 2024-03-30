@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('portfolios', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('cat_id')->constrained('categories')->onDelete('cascade');
+            $table->foreignId('category_id')->constrained('categories')->onDelete('cascade');
             $table->string('title');
             $table->string('image');
             $table->string('project_url');
